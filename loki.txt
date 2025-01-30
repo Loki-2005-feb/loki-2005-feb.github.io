@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loki's Portfolio</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4CAF50;
+            --bg-color: #1a1a1a;
+            --card-color: #2d2d2d;
+            --text-color: #fff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+        }
+
+        body {
+            background: linear-gradient(45deg, var(--bg-color), #2a2a2a);
+            color: var(--text-color);
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+        }
+
+        /* Dark/Light mode switch */
+        .theme-switch {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            cursor: pointer;
+            z-index: 1000;
+        }
+
+        /* Animated header */
+        header {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: linear-gradient(45deg, #2d2d2d, #1a1a1a);
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(var(--primary-color), transparent);
+            transform: rotate(45deg);
+            animation: glow 6s infinite linear;
+        }
+
+        @keyframes glow {
+            0% { transform: rotate(45deg) translateX(-50%); }
+            100% { transform: rotate(45deg) translateX(50%); }
+        }
+
+        .profile-img {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 3px solid var(--primary-color);
+            box-shadow: 0 0 20px var(--primary-color);
+            margin-bottom: 1rem;
+            position: relative;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* Cards with hover effects */
+        .project-card, .certification-card {
+            background: var(--card-color);
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border-radius: 15px;
+            transform-style: preserve-3d;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .project-card:hover, .certification-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        }
+
+        .project-card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 15px;
+            border: 2px solid var(--primary-color);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .project-card:hover::after {
+            opacity: 1;
+        }
+
+        /* Skill tags animation */
+        .tag {
+            display: inline-block;
+            background: var(--primary-color);
+            color: #fff;
+            padding: 0.3rem 1rem;
+            border-radius: 20px;
+            margin: 0.3rem;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tag::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: 0.5s;
+        }
+
+        .tag:hover::before {
+            left: 100%;
+        }
+
+        /* Timeline effect for certifications */
+        .certification-card {
+            position: relative;
+            padding-left: 2rem;
+        }
+
+        .certification-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 3px;
+            height: 100%;
+            background: var(--primary-color);
+        }
+
+        /* Scroll progress indicator */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: var(--primary-color);
+            z-index: 1000;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            header {
+                padding: 2rem 1rem;
+            }
+        }
+
+        .light-mode {
+            --bg-color: #f0f0f0;
+            --card-color: #fff;
+            --text-color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progressBar"></div>
+    <div class="theme-switch" id="themeSwitch">
+        <i class="fas fa-moon fa-2x"></i>
+    </div>
+
+    <header>
+        <img src="https://via.placeholder.com/150" alt="Profile" class="profile-img">
+        <h1>Loki's Portfolio</h1>
+        <p id="subtitle">God of Mischief & Master Developer</p>
+    </header>
+
+    <div class="container">
+        <!-- Projects Section -->
+        <section class="section">
+            <h2>Projects</h2>
+            <div class="projects" id="projectsContainer"></div>
+        </section>
+
+        <!-- Certifications Section -->
+        <section class="section">
+            <h2>Certifications</h2>
+            <div class="certifications" id="certificationsContainer"></div>
+        </section>
+    </div>
+
+    <footer>
+        <div class="social-links">
+            <a href="#" class="social-icon"><i class="fab fa-github"></i></a>
+            <a href="#" class="social-icon"><i class="fab fa-linkedin"></i></a>
+            <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
+        </div>
+        <p>© 2023 Loki's Portfolio - Chaos Managed with Code</p>
+    </footer>
+
+    <script>
+        // Dark/Light mode toggle
+        const themeSwitch = document.getElementById('themeSwitch');
+        const body = document.body;
+        
+        themeSwitch.addEventListener('click', () => {
+            body.classList.toggle('light-mode');
+            themeSwitch.innerHTML = body.classList.contains('light-mode') ? 
+                '<i class="fas fa-sun fa-2x"></i>' : 
+                '<i class="fas fa-moon fa-2x"></i>';
+        });
+
+        // Scroll progress indicator
+        window.onscroll = () => {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            document.getElementById('progressBar').style.width = scrolled + "%";
+        };
+
+        // Typewriter effect for subtitle
+        const subtitle = document.getElementById('subtitle');
+        const textArray = ["God of Mischief & Master Developer", "Chaos Engineer", "Shapeshifting Specialist"];
+        let index = 0;
+
+        function typeWriter(text, i = 0) {
+            if (i < text.length) {
+                subtitle.innerHTML = text.substring(0, i+1);
+                setTimeout(() => typeWriter(text, i+1), 100);
+            } else {
+                setTimeout(() => deleteText(text), 2000);
+            }
+        }
+
+        function deleteText(text) {
+            if (subtitle.innerHTML.length > 0) {
+                subtitle.innerHTML = subtitle.innerHTML.slice(0, -1);
+                setTimeout(() => deleteText(text), 50);
+            } else {
+                index = (index + 1) % textArray.length;
+                typeWriter(textArray[index]);
+            }
+        }
+
+        typeWriter(textArray[index]);
+
+        // Dynamic content loading
+        const projects = [
+            { 
+                title: "Chaos Engine", 
+                tags: ["Python", "AI", "Flask"],
+                description: "Advanced machine learning platform for chaotic pattern analysis",
+                year: 2023
+            },
+            { 
+                title: "Dimension Portal", 
+                tags: ["JavaScript", "Three.js", "WebGL"],
+                description: "3D visualization tool for multidimensional data exploration",
+                year: 2022
+            }
+        ];
+
+        const certifications = [
+            {
+                title: "Certified Chaos Engineer",
+                issuer: "Asgard University",
+                year: 2023,
+                credential: "LOKI-CHAOS-001"
+            },
+            {
+                title: "Master of Shapeshifting",
+                issuer: "Yggdrasil Institute",
+                year: 2022,
+                credential: "LOKI-SHAPE-002"
+            }
+        ];
+
+        // Render projects
+        const projectsContainer = document.getElementById('projectsContainer');
+        projects.forEach(project => {
+            const projectCard = document.createElement('div');
+            projectCard.className = 'project-card';
+            projectCard.innerHTML = `
+                <h3>${project.title} (${project.year})</h3>
+                <div class="tags">${project.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}</div>
+                <p>${project.description}</p>
+            `;
+            projectsContainer.appendChild(projectCard);
+        });
+
+        // Render certifications
+        const certificationsContainer = document.getElementById('certificationsContainer');
+        certifications.forEach(cert => {
+            const certCard = document.createElement('div');
+            certCard.className = 'certification-card';
+            certCard.innerHTML = `
+                <h3>${cert.title}</h3>
+                <p>${cert.issuer} - ${cert.year}</p>
+                <p class="credential">Credential ID: ${cert.credential}</p>
+            `;
+            certificationsContainer.appendChild(certCard);
+        });
+
+        // Parallax effect on header
+        window.addEventListener('scroll', () => {
+            const header = document.querySelector('header');
+            const scrolled = window.pageYOffset;
+            header.style.backgroundPositionY = scrolled * 0.5 + 'px';
+        });
+
+        // Hover effect for social icons
+        document.querySelectorAll('.social-icon').forEach(icon => {
+            icon.addEventListener('mouseover', () => {
+                icon.style.transform = 'translateY(-5px)';
+            });
+            icon.addEventListener('mouseout', () => {
+                icon.style.transform = 'translateY(0)';
+            });
+        });
+    </script>
+</body>
+</html>
